@@ -11,12 +11,13 @@ public class VM {
 		this.stackTop = 0;
 		this.pc = 0;
 		this.fp = 0;
-		this.stack = new int[50];
+		this.stack = new int[1000];
 	}
 
 	public void push(int value){
-		stack[++stackTop] = value;
+			stack[++stackTop] = value;
 	}
+
 	public int pop(){
 		int value = stack[stackTop];
 		stack[stackTop] = 0;
