@@ -42,8 +42,8 @@ public class Executer {
 					return;
 				} else {
 					vm.pc = retAdd.pop() - 1;	// 保持していた戻りアドレスをポップ.
-					int ans = vm.stack[vm.stackTop]; // 関数による演算結果を保持しておく.
-					while (vm.stackTop >= vm.fp) { // fpが示す番号までスタックを破棄.
+					int ans = vm.pop(); // 関数による演算結果を保持しておく.
+					for (int i = 0; i < argSize; i++) {
 						vm.pop();
 					}
 					vm.fp = preFp.pop(); // スタックしておいた以前のポインタに戻す.

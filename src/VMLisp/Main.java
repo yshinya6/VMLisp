@@ -17,7 +17,7 @@ public class Main {
 		fibCode.add(new VMCode(1));
 		fibCode.add(new VMCode(Executer.command.PRINT));
 		fibCode.add(new VMCode(Executer.command.RET));
-		//executer.funcList.add(new Function(fibCode.size(), 1));
+		executer.funcList.add(new Function(fibCode.size(), 1));
 		fibCode.add(new VMCode(Executer.command.LOAD_ARG));
 		fibCode.add(new VMCode(1));
 		fibCode.add(new VMCode(Executer.command.PUSH));
@@ -57,7 +57,7 @@ public class Main {
 		takCode.add(new VMCode(1));
 		takCode.add(new VMCode(Executer.command.PRINT));
 		takCode.add(new VMCode(Executer.command.RET));
-		executer.funcList.add(new Function(takCode.size(), 3));
+		//executer.funcList.add(new Function(takCode.size(), 3));
 		takCode.add(new VMCode(Executer.command.LOAD_ARG));
 		takCode.add(new VMCode(1));
 		takCode.add(new VMCode(Executer.command.LOAD_ARG));
@@ -105,7 +105,7 @@ public class Main {
 		takCode.add(new VMCode(1));
 		takCode.add(new VMCode(Executer.command.RET));
 
-		executer.execute(vm, takCode);
+		executer.execute(vm, fibCode);
 	}
 
 
