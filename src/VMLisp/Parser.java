@@ -2,6 +2,8 @@ package VMLisp;
 
 import java.util.List;
 
+import Node.Node;
+
 // 構文解析クラス
 public class Parser {
 	public List<String> tokens;
