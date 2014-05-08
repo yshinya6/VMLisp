@@ -30,31 +30,31 @@ public class Compiler {
 			break;
 
 		case "+":
-			genOPCode(Executer.command.ADD);
+			genOPCode(tree,Executer.command.ADD);
 			break;
 		case "-":
-			genOPCode(Executer.command.SUB);
+			genOPCode(tree,Executer.command.SUB);
 			break;
 		case "*":
-			genOPCode(Executer.command.MUL);
+			genOPCode(tree,Executer.command.MUL);
 			break;
 		case "/":
-			genOPCode(Executer.command.DIV);
+			genOPCode(tree,Executer.command.DIV);
 			break;
 		case ">":
-			genOPCode(Executer.command.GT);
+			genOPCode(tree,Executer.command.GT);
 			break;
 		case "=":
-			genOPCode(Executer.command.EQ);
+			genOPCode(tree,Executer.command.EQ);
 			break;
 		case "<":
-			genOPCode(Executer.command.LT);
+			genOPCode(tree,Executer.command.LT);
 			break;
 		case "<=":
-			genOPCode(Executer.command.LTEQ);
+			genOPCode(tree,Executer.command.LTEQ);
 			break;
 		case ">=":
-			genOPCode(Executer.command.GTEQ);
+			genOPCode(tree,Executer.command.GTEQ);
 			break;
 
 		case "if":
@@ -80,12 +80,12 @@ public class Compiler {
 
 						break;
 					default: // 二回目以降
-						genFuncCode();
+						genFuncCode(tree, funcMap.get(tree.token));
 						break;
 					}
 
 				}else{ // それ以外の文字(変数定義には未対応)
-					System.out.println("COMPILE ERROR !! (I DON'T KNOW"+ tree.token + " .)");
+					System.out.println("COMPILE ERROR !! (I DON'T KNOW "+ tree.token + " .)");
 					break;
 				}
 			}
@@ -123,7 +123,7 @@ public class Compiler {
 		carNode = carNode.rightNode; // 式部分の括弧を指定する。
 		tree = carNode;
 
-		funcList.add(new Function(0, i + 1, tree));
+		funcList.add(new Function(0, i, tree));
 
 
 	}
@@ -141,7 +141,7 @@ public class Compiler {
 	}
 
 	//演算子コード生成メソッド
-	public void genOPCode(Executer.command OP){
+	public void genOPCode(Node tree, Executer.command OP){
 		if (tree.leftNode != null){
 			Node preNode = tree;
 			tree = tree.leftNode;
@@ -157,27 +157,35 @@ public class Compiler {
 		codeList.add(new VMCode(OP));
 	}
 	//関数呼び出しコード生成メソッド
-	public void genFuncCode(){
-
+	public void genFuncCode(Node tree, int funcNum){
+		tree = tree.rightNode;
+		Analysis(tree.leftNode);
+		codeList.add(new VMCode(Executer.command.CALL));
+		codeList.add(new VMCode(funcNum));
+		if (tree.rightNode != null) {
+			Analysis(tree.rightNode);
+		}
 	}
 
 	// if文コンパイルメソッド
 	public void ifCompile(Node tree){
 		tree = tree.rightNode;
 		Node carNode = tree;
-		Analysis(carNode); // 条件式の読み込み.
+		Analysis(carNode.leftNode); // 条件式の読み込み.
 		codeList.add(new VMCode(Executer.command.IF_JUMP));
 		codeList.add(new VMCode(0)); // JUMP先の番号はまだ決定していないので0としておき、領域だけ確保しておく.
 		int index = codeList.size() - 1;
 		tree = tree.rightNode;
 		carNode = tree;
-		Analysis(carNode); // true式の読み込み.
+		Analysis(carNode.leftNode); // true式の読み込み.
 		codeList.add(new VMCode(Executer.command.RET));
-		codeList.set(index,  new VMCode(codeList.size() - 1)); // JUMP先のコード番号をセットする.
+		codeList.set(index,  new VMCode(codeList.size())); // JUMP先のコード番号をセットする.
 		tree = tree.rightNode;
 		carNode = tree;
-		Analysis(carNode); // false式の読み込み.
+		Analysis(carNode.leftNode); // false式の読み込み.
+		if (flag != 1) {
 		codeList.add(new VMCode(Executer.command.RET));
+		}
 	}
 	// 関数コンパイルメソッド
 	public void funcCompile(Node tree, int funcNum){
@@ -187,7 +195,11 @@ public class Compiler {
 		codeList.add(new VMCode(funcNum));
 		codeList.add(new VMCode(Executer.command.PRINT));
 		codeList.add(new VMCode(Executer.command.RET));
+		funcList.get(funcNum).startAddress = codeList.size();
 		tree = funcList.get(funcNum).funcNode;
+		Analysis(tree);
+		codeList.add(new VMCode(Executer.command.RET));
+
 
 
 	}

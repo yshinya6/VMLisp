@@ -7,7 +7,6 @@ public class Executer {
 	int arg1, arg2, arg3,argSize,count = 0;
 	LinkedList<Integer> preFp = new LinkedList<Integer>(); // CALL命令前のfp
 	public ArrayList<Function> funcList = new ArrayList<Function>(); // 関数の開始番号を関数ごとに格納したリスト.
-	public ArrayList<VMCode> codeList = new ArrayList<VMCode>(); // 入力コードのリスト.
 	public LinkedList<Integer> retAdd = new LinkedList<Integer>();
 
 	public enum command {
@@ -125,18 +124,22 @@ public class Executer {
 				retAdd.push(vm.pc + 2);	// 関数呼び出し命令の次の命令を格納したアドレスをスタックしておく.
 				preFp.push(vm.fp);	// function pointer を保持しておく.
 				vm.fp = vm.stackTop;	// 現在のスタックトップが関数ポインターとなる.
-				vm.pc = funcList.get(codeList.get(vm.pc + 1).value - 1).startAddress; // program counterを関数の開始アドレスに合わせる.
-				argSize = funcList.get(codeList.get(vm.pc + 1).value - 1).argSize;
+				vm.pc = funcList.get(codeList.get(vm.pc + 1).value).startAddress; // program counterを関数の開始アドレスに合わせる.
+				argSize = funcList.get(codeList.get(vm.pc + 1).value).argSize;
 				vm.pc--;	 // 次のインクリメントで丁度開始アドレスになるように調整しておく.
 				count++;
 				break;
 			case LOAD_ARG:
 				int num = codeList.get(++vm.pc).value;	 // 引数の番号を読み取る.
-				int arg = vm.stack[vm.fp - argSize + num]; // 引数を呼び出す.
+				int arg = vm.stack[vm.fp - argSize + num + 1]; // 引数を呼び出す.
 				vm.push(arg);
 				break;
 			}
 			vm.pc++;
+			if (vm.pc == codeList.size()) {
+				System.out.println(vm.pop());
+				break;
+			}
 		}
 	}
 
