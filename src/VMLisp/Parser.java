@@ -9,6 +9,7 @@ public class Parser {
 	public List<String> tokens;
 	public int i = 0;
 	public Node node;
+	public int count = 0;
 
 	public Parser(List<String> tokens) {
 		this.tokens = tokens;
@@ -24,10 +25,12 @@ public class Parser {
 				i++;
 				node.leftNode = maketree();
 				node.rightNode = maketree();
+				count++;
 				break;
 
 			case ")":
 				i++;
+				count--;
 				break;
 
 			default:

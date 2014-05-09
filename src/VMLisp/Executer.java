@@ -42,12 +42,12 @@ public class Executer {
 				} else {
 					vm.pc = retAdd.pop() - 1;	// 保持していた戻りアドレスをポップ.
 					int ans = vm.pop(); // 関数による演算結果を保持しておく.
-					for (int i = 0; i < argSize; i++) {
+					for (int i = 0; i < argSize; i++) { // スタックにある引数をポップする.
 						vm.pop();
 					}
 					vm.fp = preFp.pop(); // スタックしておいた以前のポインタに戻す.
 					vm.push(ans); // 保持していた結果を格納.
-					count--;
+					count--;	//呼び出しカウンタを減らす.
 				}
 				break;
 
@@ -136,7 +136,7 @@ public class Executer {
 				break;
 			}
 			vm.pc++;
-			if (vm.pc == codeList.size()) {
+			if (vm.pc == codeList.size()) { // コードリストの終端まで来たら演算結果を表示して終了. 毎回if文を通ってしまうので遅い原因の一つか.
 				System.out.println(vm.pop());
 				break;
 			}

@@ -77,7 +77,6 @@ public class Compiler {
 					case 0: // 呼び出し一回目
 						flag = 1;
 						funcCompile(tree, funcMap.get(tree.token));
-
 						break;
 					default: // 二回目以降
 						genFuncCode(tree, funcMap.get(tree.token));
@@ -97,21 +96,13 @@ public class Compiler {
 		}
 	}
 
-
-
-
-
-
 	// 関数定義メソッド
 	public void defun(Node tree) {
 
-		tree = tree.rightNode;
-		Node carNode = tree;
 		tree = tree.leftNode;
-
 		funcMap.put(tree.token, funcCount++); // 関数名の登録.
 
-		carNode = carNode.rightNode;
+		Node carNode = tree.rightNode;
 		tree = carNode.leftNode;
 
 		int i = 0;
@@ -120,8 +111,9 @@ public class Compiler {
 			tree = tree.leftNode;
 		}
 
-		carNode = carNode.rightNode; // 式部分の括弧を指定する。
-		tree = carNode;
+		 // 式部分の括弧を指定する。
+		tree = carNode.rightNode;
+
 
 		funcList.add(new Function(0, i, tree));
 
@@ -158,13 +150,18 @@ public class Compiler {
 	}
 	//関数呼び出しコード生成メソッド
 	public void genFuncCode(Node tree, int funcNum){
-		tree = tree.rightNode;
-		Analysis(tree.leftNode);
+		Node carNode = tree;
+		if (tree.rightNode != null) {
+			tree = tree.rightNode;
+			Analysis(tree);
+			tree = carNode;
+		}
+		if (tree.leftNode != null) {
+			tree = tree.leftNode;
+			Analysis(tree);
+		}
 		codeList.add(new VMCode(Executer.command.CALL));
 		codeList.add(new VMCode(funcNum));
-		if (tree.rightNode != null) {
-			Analysis(tree.rightNode);
-		}
 	}
 
 	// if文コンパイルメソッド
@@ -177,7 +174,7 @@ public class Compiler {
 		int index = codeList.size() - 1;
 		tree = tree.rightNode;
 		carNode = tree;
-		Analysis(carNode.leftNode); // true式の読み込み.
+		Analysis(carNode); // true式の読み込み.
 		codeList.add(new VMCode(Executer.command.RET));
 		codeList.set(index,  new VMCode(codeList.size())); // JUMP先のコード番号をセットする.
 		tree = tree.rightNode;
@@ -187,9 +184,10 @@ public class Compiler {
 		codeList.add(new VMCode(Executer.command.RET));
 		}
 	}
+
 	// 関数コンパイルメソッド
 	public void funcCompile(Node tree, int funcNum){
-		tree = tree.rightNode;
+		tree = tree.leftNode;
 		Analysis(tree);
 		codeList.add(new VMCode(Executer.command.CALL));
 		codeList.add(new VMCode(funcNum));
@@ -197,11 +195,8 @@ public class Compiler {
 		codeList.add(new VMCode(Executer.command.RET));
 		funcList.get(funcNum).startAddress = codeList.size();
 		tree = funcList.get(funcNum).funcNode;
-		Analysis(tree);
+		Analysis(tree.leftNode);
 		codeList.add(new VMCode(Executer.command.RET));
-
-
-
 	}
 
 	// 文字列が数字であるかどうか判別するメソッド
